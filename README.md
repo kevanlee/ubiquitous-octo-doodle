@@ -1,6 +1,8 @@
 # ubiquitous-octo-doodle
 A browser-based implementation of the classic Rook card game, featuring AI opponents and a complete game interface.
 
+Dev not: python3 -m http.server 2000
+
 ## 🎮 Rook Card Game
 
 Rook is a classic trick-taking card game that uses a special deck with 56 cards (4 suits with values 1-14) plus a special Rook card. This implementation features:

@@ -2,24 +2,35 @@ const suits = ['Red', 'Green', 'Black', 'Yellow'];
 const values = Array.from({ length: 14 }, (_, i) => i + 1); // 1–14 like Rook
 let deck = [];
 
+// PLAYER INDEX MAPPING (clockwise):
+// 0 = player (You, top)
+// 1 = P3 (right)
+// 2 = P2 (bottom)
+// 3 = P1 (left)
+
 let playerHand = [];
-let p1Hand = [];
-let p2Hand = [];
 let p3Hand = [];
+let p2Hand = [];
+let p1Hand = [];
+let hands = [playerHand, p3Hand, p2Hand, p1Hand];
 let kitty = [];
 let currentRound = 0;
 let playerPoints = 0;
-let p1Points = 0;
-let p2Points = 0;
 let p3Points = 0;
+let p2Points = 0;
+let p1Points = 0;
 let playerTricks = [];
-let p1Tricks = [];
-let p2Tricks = [];
 let p3Tricks = [];
-let currentTurn = 0; // 0=player, 1=p1, 2=p2, 3=p3
-let trickWinnerIndex = 0; // 0=player, 1=p1, 2=p2, 3=p3
+let p2Tricks = [];
+let p1Tricks = [];
+let tricksArr = [playerTricks, p3Tricks, p2Tricks, p1Tricks];
+let currentTurn = 0; // 0=player, 1=p3, 2=p2, 3=p1
+let trickWinnerIndex = 0; // 0=player, 1=p3, 2=p2, 3=p1
 let waitingForNextTrick = false;
 let playsThisTrick = 0;
+
+// DOM mapping for played cards
+const playedCardIds = ['player-played', 'p3-played', 'p2-played', 'p1-played'];
 
 // Debug log system
 let debugLog = [];
@@ -61,14 +72,15 @@ function dealCards() {
   
   // Initialize hands and kitty
   playerHand = [];
-  p1Hand = [];
-  p2Hand = [];
   p3Hand = [];
+  p2Hand = [];
+  p1Hand = [];
+  hands = [playerHand, p3Hand, p2Hand, p1Hand];
   kitty = [];
   
   // Deal in rotation: Player, P1, P2, P3, Kitty (until kitty has 5)
   let kittyCount = 0;
-  let currentPlayer = 0; // 0=player, 1=p1, 2=p2, 3=p3, 4=kitty
+  let currentPlayer = 0; // 0=player, 1=p3, 2=p2, 3=p1, 4=kitty
   
   while (deck.length > 0) {
     const card = deck.shift();
@@ -76,11 +88,11 @@ function dealCards() {
     if (currentPlayer === 0) {
       playerHand.push(card);
     } else if (currentPlayer === 1) {
-      p1Hand.push(card);
+      p3Hand.push(card);
     } else if (currentPlayer === 2) {
       p2Hand.push(card);
     } else if (currentPlayer === 3) {
-      p3Hand.push(card);
+      p1Hand.push(card);
     } else if (currentPlayer === 4 && kittyCount < 5) {
       kitty.push(card);
       kittyCount++;
@@ -104,9 +116,9 @@ function dealCards() {
 
 function renderAllHands() {
   renderPlayerHand();
-  renderP1Hand();
-  renderP2Hand();
   renderP3Hand();
+  renderP2Hand();
+  renderP1Hand();
 }
 
 function updatePlayerHandStats() {
@@ -244,16 +256,14 @@ function playCard(index) {
   if (waitingForNextTrick) return;
   if (playsThisTrick >= 4) return;
   const card = playerHand.splice(index, 1)[0];
-  displayPlayedCard('player-played', card);
+  displayPlayedCard(playedCardIds[0], card);
   renderPlayerHand();
   updateGameStats();
   addDebugLog(`You played: ${card.value} of ${card.suit}`);
   playsThisTrick++;
-  // Start AI turns
-  currentTurn = 1;
+  currentTurn = 1; // Next: P3
   updateLeadIndicator();
   setTimeout(() => aiTurn(), 1000);
-  // Disable Next trick button during play
   const nextBtn = document.getElementById('next-trick-btn');
   if (nextBtn) nextBtn.disabled = true;
   if (playsThisTrick === 4) {
@@ -262,44 +272,34 @@ function playCard(index) {
 }
 
 function aiTurn() {
+  if (waitingForNextTrick) return;
   if (playsThisTrick >= 4) return;
-  let card, playerName, handArray;
-  
-  switch(currentTurn) {
-    case 1:
-      card = p1Hand.splice(getLowestCardIndex(p1Hand), 1)[0];
-      playerName = 'P1 (Rook)';
-      handArray = p1Hand;
-      displayPlayedCard('p1-played', card);
-      renderP1Hand();
-      addDebugLog(`${playerName} played: ${card.value} of ${card.suit}`);
-      break;
-    case 2:
-      card = p2Hand.splice(getHighestCardIndex(p2Hand), 1)[0];
-      playerName = 'P2 (Shadow)';
-      handArray = p2Hand;
-      displayPlayedCard('p2-played', card);
-      renderP2Hand();
-      addDebugLog(`${playerName} played: ${card.value} of ${card.suit}`);
-      break;
-    case 3:
-      card = p3Hand.splice(getRandomCardIndex(p3Hand), 1)[0];
-      playerName = 'P3 (Blitz)';
-      handArray = p3Hand;
-      displayPlayedCard('p3-played', card);
-      renderP3Hand();
-      addDebugLog(`${playerName} played: ${card.value} of ${card.suit}`);
-      break;
+  let hand, name, playedId;
+  if (currentTurn === 1) {
+    hand = p3Hand;
+    name = 'P3';
+    playedId = playedCardIds[1];
+  } else if (currentTurn === 2) {
+    hand = p2Hand;
+    name = 'P2';
+    playedId = playedCardIds[2];
+  } else if (currentTurn === 3) {
+    hand = p1Hand;
+    name = 'P1';
+    playedId = playedCardIds[3];
   }
-  
-  updateGameStatus(`${playerName} played: ${card.value} of ${card.suit}`);
+  if (!hand || hand.length === 0) return;
+  const card = hand.shift();
+  displayPlayedCard(playedId, card);
+  renderAllHands();
+  updateGameStats();
+  addDebugLog(`${name} played: ${card.value} of ${card.suit}`);
   playsThisTrick++;
-  currentTurn++;
+  currentTurn = (currentTurn + 1) % 4;
   updateLeadIndicator();
-  if (currentTurn <= 3) {
+  if (playsThisTrick < 4 && currentTurn !== 0) {
     setTimeout(() => aiTurn(), 1000);
-  }
-  if (playsThisTrick === 4) {
+  } else if (playsThisTrick === 4) {
     setTimeout(() => resolveTrick(), 500);
   }
 }
@@ -330,15 +330,15 @@ function getRandomCardIndex(hand) {
 
 function resolveTrick() {
   // Get all played cards
-  const playerCard = getPlayedCard('player-played');
-  const p1Card = getPlayedCard('p1-played');
-  const p2Card = getPlayedCard('p2-played');
-  const p3Card = getPlayedCard('p3-played');
+  const playerCard = getPlayedCard(playedCardIds[0]);
+  const p3Card = getPlayedCard(playedCardIds[1]);
+  const p2Card = getPlayedCard(playedCardIds[2]);
+  const p1Card = getPlayedCard(playedCardIds[3]);
   const allCards = [
     { card: playerCard, player: 'You', index: 0 },
-    { card: p1Card, player: 'P1 (Rook)', index: 1 },
-    { card: p2Card, player: 'P2 (Shadow)', index: 2 },
-    { card: p3Card, player: 'P3 (Blitz)', index: 3 }
+    { card: p3Card, player: 'P3', index: 1 },
+    { card: p2Card, player: 'P2', index: 2 },
+    { card: p1Card, player: 'P1', index: 3 }
   ];
   // Find winner (highest card)
   let winner = allCards[0];
@@ -349,21 +349,8 @@ function resolveTrick() {
   }
   trickWinnerIndex = winner.index;
   // Collect trick
-  const trick = [playerCard, p1Card, p2Card, p3Card];
-  switch(winner.player) {
-    case 'You':
-      playerTricks.push(trick);
-      break;
-    case 'P1 (Rook)':
-      p1Tricks.push(trick);
-      break;
-    case 'P2 (Shadow)':
-      p2Tricks.push(trick);
-      break;
-    case 'P3 (Blitz)':
-      p3Tricks.push(trick);
-      break;
-  }
+  const trick = [playerCard, p3Card, p2Card, p1Card];
+  tricksArr[winner.index].push(trick);
   addDebugLog(`<strong>Trick ${currentRound + 1} winner:</strong> ${winner.player} (${winner.card.value} of ${winner.card.suit})`);
   updateGameStatus(`Round ${currentRound + 1}: ${winner.player} wins!`);
   renderAllTricks();
@@ -419,10 +406,9 @@ function getPlayedCard(elementId) {
 }
 
 function clearPlayedCards() {
-  document.getElementById('p1-played').innerHTML = '';
-  document.getElementById('p2-played').innerHTML = '';
-  document.getElementById('p3-played').innerHTML = '';
-  document.getElementById('player-played').innerHTML = '';
+  playedCardIds.forEach(id => {
+    document.getElementById(id).innerHTML = '';
+  });
 }
 
 function displayPlayedCard(elementId, card) {
@@ -439,9 +425,9 @@ function displayPlayedCard(elementId, card) {
 function updateGameStatus(message = '') {
   const statusDiv = document.getElementById('game-status');
   const playerCount = playerHand.length;
-  const p1Count = p1Hand.length;
-  const p2Count = p2Hand.length;
   const p3Count = p3Hand.length;
+  const p2Count = p2Hand.length;
+  const p1Count = p1Hand.length;
   
   if (message) {
     statusDiv.textContent = message;
@@ -451,7 +437,7 @@ function updateGameStatus(message = '') {
       return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
     }, 0);
     
-    const p1TotalPoints = p1Tricks.reduce((total, trick) => {
+    const p3TotalPoints = p3Tricks.reduce((total, trick) => {
       return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
     }, 0);
     
@@ -459,30 +445,22 @@ function updateGameStatus(message = '') {
       return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
     }, 0);
     
-    const p3TotalPoints = p3Tricks.reduce((total, trick) => {
+    const p1TotalPoints = p1Tricks.reduce((total, trick) => {
       return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
     }, 0);
     
     const yourTeamPoints = playerTotalPoints + p2TotalPoints;
-    const opponentTeamPoints = p1TotalPoints + p3TotalPoints;
+    const opponentTeamPoints = p3TotalPoints + p1TotalPoints;
     
     statusDiv.textContent = `Cards remaining: ${playerCount} | Team Scores - Your Team: ${yourTeamPoints} | Opponent Team: ${opponentTeamPoints}`;
   }
 }
 
 function updateGameStats() {
-  document.getElementById('hands-remaining').textContent = Math.max(playerHand.length, p1Hand.length, p2Hand.length, p3Hand.length);
+  document.getElementById('hands-remaining').textContent = Math.max(playerHand.length, p3Hand.length, p2Hand.length, p1Hand.length);
   
   // Calculate total points from tricks for each player
   const playerTotalPoints = playerTricks.reduce((total, trick) => {
-    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
-  }, 0);
-  
-  const p1TotalPoints = p1Tricks.reduce((total, trick) => {
-    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
-  }, 0);
-  
-  const p2TotalPoints = p2Tricks.reduce((total, trick) => {
     return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
   }, 0);
   
@@ -490,15 +468,23 @@ function updateGameStats() {
     return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
   }, 0);
   
+  const p2TotalPoints = p2Tricks.reduce((total, trick) => {
+    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
+  }, 0);
+  
+  const p1TotalPoints = p1Tricks.reduce((total, trick) => {
+    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
+  }, 0);
+  
   // Calculate team scores
   const yourTeamPoints = playerTotalPoints + p2TotalPoints;
-  const opponentTeamPoints = p1TotalPoints + p3TotalPoints;
+  const opponentTeamPoints = p3TotalPoints + p1TotalPoints;
   
   // Update individual scores
   document.getElementById('player-points').textContent = playerTotalPoints;
-  document.getElementById('p1-points').textContent = p1TotalPoints;
-  document.getElementById('p2-points').textContent = p2TotalPoints;
   document.getElementById('p3-points').textContent = p3TotalPoints;
+  document.getElementById('p2-points').textContent = p2TotalPoints;
+  document.getElementById('p1-points').textContent = p1TotalPoints;
   
   // Update team scores
   document.getElementById('your-team-points').textContent = yourTeamPoints;
@@ -522,6 +508,7 @@ function updateAIStats() {
   }
   if (p1TricksElem) p1TricksElem.textContent = p1TricksCount;
   if (p1ScoreElem) p1ScoreElem.textContent = p1Score;
+
   // P2
   const p2TricksElem = document.getElementById('p2-tricks-taken');
   const p2ScoreElem = document.getElementById('p2-score');
@@ -534,6 +521,7 @@ function updateAIStats() {
   }
   if (p2TricksElem) p2TricksElem.textContent = p2TricksCount;
   if (p2ScoreElem) p2ScoreElem.textContent = p2Score;
+
   // P3
   const p3TricksElem = document.getElementById('p3-tricks-taken');
   const p3ScoreElem = document.getElementById('p3-score');
@@ -550,20 +538,12 @@ function updateAIStats() {
 
 function endGame() {
   const playerScore = 13 - playerHand.length;
-  const p1Score = 13 - p1Hand.length;
-  const p2Score = 13 - p2Hand.length;
   const p3Score = 13 - p3Hand.length;
+  const p2Score = 13 - p2Hand.length;
+  const p1Score = 13 - p1Hand.length;
   
   // Calculate final points
   const playerFinalPoints = playerTricks.reduce((total, trick) => {
-    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
-  }, 0);
-  
-  const p1FinalPoints = p1Tricks.reduce((total, trick) => {
-    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
-  }, 0);
-  
-  const p2FinalPoints = p2Tricks.reduce((total, trick) => {
     return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
   }, 0);
   
@@ -571,9 +551,17 @@ function endGame() {
     return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
   }, 0);
   
+  const p2FinalPoints = p2Tricks.reduce((total, trick) => {
+    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
+  }, 0);
+  
+  const p1FinalPoints = p1Tricks.reduce((total, trick) => {
+    return total + trick.reduce((trickPoints, card) => trickPoints + getCardPoints(card), 0);
+  }, 0);
+  
   // Calculate team scores
   const yourTeamFinalPoints = playerFinalPoints + p2FinalPoints;
-  const opponentTeamFinalPoints = p1FinalPoints + p3FinalPoints;
+  const opponentTeamFinalPoints = p3FinalPoints + p1FinalPoints;
   
   // Determine team winner
   let winningTeam, teamMessage;
@@ -588,7 +576,7 @@ function endGame() {
     teamMessage = `It's a tie! (${yourTeamFinalPoints} vs ${opponentTeamFinalPoints})`;
   }
   
-  updateGameStatus(`Game Over! ${teamMessage} Final Scores - Your Team: ${yourTeamFinalPoints} (You: ${playerFinalPoints}, P2: ${p2FinalPoints}) | Opponent Team: ${opponentTeamFinalPoints} (P1: ${p1FinalPoints}, P3: ${p3FinalPoints})`);
+  updateGameStatus(`Game Over! ${teamMessage} Final Scores - Your Team: ${yourTeamFinalPoints} (You: ${playerFinalPoints}, P2: ${p2FinalPoints}) | Opponent Team: ${opponentTeamFinalPoints} (P3: ${p3FinalPoints}, P1: ${p1FinalPoints})`);
 }
 
 function shuffleHand() {
@@ -605,39 +593,27 @@ function updateKittyPill() {
 }
 
 function updateLeadIndicator() {
-  // Clear all indicators
-  const ids = ['lead-player', 'lead-p1', 'lead-p2', 'lead-p3'];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = '';
-  });
-  // Determine who leads next (currentTurn)
-  let leadId = '';
-  switch (currentTurn) {
-    case 0:
-      leadId = 'lead-player'; break;
-    case 1:
-      leadId = 'lead-p1'; break;
-    case 2:
-      leadId = 'lead-p2'; break;
-    case 3:
-      leadId = 'lead-p3'; break;
-  }
-  const leadEl = document.getElementById(leadId);
-  if (leadEl) leadEl.textContent = '👉';
+  document.getElementById('lead-player').style.opacity = '0.2';
+  document.getElementById('lead-p1').style.opacity = '0.2';
+  document.getElementById('lead-p2').style.opacity = '0.2';
+  document.getElementById('lead-p3').style.opacity = '0.2';
+  if (currentTurn === 0) document.getElementById('lead-player').style.opacity = '1';
+  if (currentTurn === 1) document.getElementById('lead-p3').style.opacity = '1';
+  if (currentTurn === 2) document.getElementById('lead-p2').style.opacity = '1';
+  if (currentTurn === 3) document.getElementById('lead-p1').style.opacity = '1';
 }
 
 function startGame() {
   currentRound = 0;
   currentTurn = 0;
   playerPoints = 0;
-  p1Points = 0;
-  p2Points = 0;
   p3Points = 0;
+  p2Points = 0;
+  p1Points = 0;
   playerTricks = [];
-  p1Tricks = [];
-  p2Tricks = [];
   p3Tricks = [];
+  p2Tricks = [];
+  p1Tricks = [];
   buildDeck();
   shuffle(deck);
   dealCards();
