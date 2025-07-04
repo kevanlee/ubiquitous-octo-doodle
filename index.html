@@ -2,30 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Last Video Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rook-Inspired Card Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="game">
-    <h1>🎬 Last Video Store</h1>
-    <div id="inventory-section">
-      <h2>Incoming Tapes</h2>
-      <div id="incoming-tapes" class="tape-container"></div>
-    </div>
-
-    <div id="shelf-section">
-      <h2>Shelves</h2>
-      <div id="shelves" class="shelf-grid"></div>
-    </div>
-
-    <div id="customer-section">
-      <h2>Customer Requests</h2>
-      <div id="request-box"></div>
-      <button id="serve-button">Serve Customer</button>
+    <h1>Rook 🐦‍⬛</h1>
+    <div class="game-columns">
+      <!-- Row 1: Player hand and tricks (full width) -->
+      <div class="player-row">
+        <div id="player-hand" class="hand">
+          <h2>Your Hand</h2>
+          <p>Tricks taken: <span id="player-tricks-taken">0</span></p>
+          <p>Score: <span id="player-score">0</span></p>
+          <div class="hand-container">
+            <div id="player-cards"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Row 2: P1, play area, P3 -->
+      <div class="ai-row-main">
+        <div class="ai-player p1">
+          <h3>P1 (Rook)</h3>
+          <div class="hand-container">
+            <div id="p1-cards"></div>
+          </div>
+          <div class="ai-info">
+            <p>Tricks taken: <span id="p1-tricks-taken">0</span></p>
+            <p>Score: <span id="p1-score">0</span></p>
+          </div>
+        </div>
+        <div id="play-area">
+          <h2>Play Area</h2>
+          <div id="played-cards">
+            <div>
+              <div class="play-label">P1 <span class="lead-indicator" id="lead-p1"></span></div>
+              <div id="p1-played"></div>
+            </div>
+            <div>
+              <div class="play-label">P2 <span class="lead-indicator" id="lead-p2"></span></div>
+              <div id="p2-played"></div>
+            </div>
+            <div>
+              <div class="play-label">P3 <span class="lead-indicator" id="lead-p3"></span></div>
+              <div id="p3-played"></div>
+            </div>
+            <div>
+              <div class="play-label">You <span class="lead-indicator" id="lead-player"></span></div>
+              <div id="player-played"></div>
+            </div>
+          </div>
+          <div id="game-status"></div>
+          <button id="next-trick-btn" style="margin-top:1rem;">Next trick</button>
+        </div>
+        <div class="ai-player p3">
+          <h3>P3 (Blitz)</h3>
+          <div class="hand-container">
+            <div id="p3-cards"></div>
+          </div>
+          <div class="ai-info">
+            <p>Tricks taken: <span id="p3-tricks-taken">0</span></p>
+            <p>Score: <span id="p3-score">0</span></p>
+          </div>
+        </div>
+      </div>
+      <!-- Row 3: P2 centered -->
+      <div class="ai-row-bottom">
+        <div class="ai-player p2">
+          <h3>P2 (Shadow)</h3>
+          <div class="hand-container">
+            <div id="p2-cards"></div>
+          </div>
+          <div class="ai-info">
+            <p>Tricks taken: <span id="p2-tricks-taken">0</span></p>
+            <p>Score: <span id="p2-score">0</span></p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
+  <div class="onboarding-tour">
+    <div class="tour-header">
+      <span>Game Tour</span>
+      <button id="tour-toggle-btn" aria-label="Toggle tour" style="margin-left: 1em; font-size: 1.1em;">–</button>
+    </div>
+    <div class="tour-item" id="tour-deal">
+      <span class="tour-checkbox">☐</span>
+      <span class="tour-text">Deal</span>
+    </div>
+    <div class="tour-item" id="tour-bidding">
+      <span class="tour-checkbox">☐</span>
+      <span class="tour-text">Bidding <span id="kitty-pill"></span></span>
+    </div>
+    <div class="tour-item" id="tour-power-suit">
+      <span class="tour-checkbox">☐</span>
+      <span class="tour-text">Power suit</span>
+    </div>
+    <div class="tour-item" id="tour-your-turn">
+      <span class="tour-checkbox">☐</span>
+      <span class="tour-text">It's my turn</span>
+    </div>
+    <div class="tour-item" id="tour-trick-progress">
+      <span class="tour-checkbox">☐</span>
+      <span class="tour-text">You win trick 7 of 13</span>
+    </div>
+    <div class="tour-item" id="tour-tricks-left">
+      <span class="tour-checkbox">☐</span>
+      <span class="tour-text">1 of 13 tricks left</span>
+    </div>
+    <div class="tour-item" id="tour-scoring">
+      <span class="tour-checkbox">☐</span>
+      <span class="tour-text">Scoring</span>
+    </div>
+  </div>
+  <div id="controls">
+    <div class="controls-container">
+      <div id="game-stats">
+        <div class="stat-item">
+          <span class="stat-label">Hands Remaining:</span>
+          <span id="hands-remaining" class="stat-value">13</span>
+        </div>
+        <div class="stat-item team-header">
+          <span class="stat-label">Your Team (Player + P2):</span>
+          <span id="your-team-points" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Your Points:</span>
+          <span id="player-points" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">P2 Points:</span>
+          <span id="p2-points" class="stat-value">0</span>
+        </div>
+        <div class="stat-item team-header">
+          <span class="stat-label">Opponent Team (P1 + P3):</span>
+          <span id="opponent-team-points" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">P1 Points:</span>
+          <span id="p1-points" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">P3 Points:</span>
+          <span id="p3-points" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Current Bid:</span>
+          <span id="current-bid" class="stat-value">-</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Trump Suit:</span>
+          <span id="trump-suit" class="stat-value">-</span>
+        </div>
+      </div>
+      <div id="game-rules">
+        <h3>Game Rules</h3>
+        <div class="rules-content">
+          <p><strong>Objective:</strong> Win tricks by playing higher cards.</p>
+          <p><strong>Card Values:</strong> 1-14 (14 is highest)</p>
+          <p><strong>Point Cards:</strong> 14, 10, 5 = 10 points each</p>
+          <p><strong>Suits:</strong> Red ♥, Green ♠, Black ♣, Yellow ♦</p>
+          <p><strong>Special:</strong> Rook card 🃏 (value 0)</p>
+          <p><strong>Scoring:</strong> Collect point cards to score</p>
+          <p><strong>Winning:</strong> Higher card value wins the round</p>
+        </div>
+      </div>
+    </div>
+    <div id="control-buttons">
+      <button id="new-game-btn" onclick="startGame()">New Game</button>
+    </div>
+  </div>
+  <div id="debug-section">
+    <h2>Live Commentary</h2>
+    <div id="debug-log" class="debug-log"></div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
