@@ -30,6 +30,7 @@ let waitingForNextTrick = false;
 let playsThisTrick = 0;
 let currentLeadColor = '';
 let currentTrickLeader = 0; // Track who led the current trick
+let currentTrumpSuit = ''; // Track the current trump suit
 
 // DOM mapping for played cards
 const playedCardIds = ['player-played', 'p3-played', 'p2-played', 'p1-played'];
@@ -621,6 +622,44 @@ function updateKittyPill() {
   }
 }
 
+function updateDealPill() {
+  const pill = document.getElementById('deal-pill');
+  if (pill) {
+    pill.textContent = `Kitty (5)`;
+  }
+}
+
+function updateBidPill() {
+  const pill = document.getElementById('bid-pill');
+  if (pill && highestBidder !== null) {
+    pill.textContent = `${playerNames[highestBidder]} at ${currentBid} points`;
+  } else if (pill) {
+    pill.textContent = '';
+  }
+}
+
+function updatePowerSuitPill() {
+  const pill = document.getElementById('power-suit-pill');
+  if (pill && currentTrumpSuit) {
+    pill.textContent = currentTrumpSuit;
+    
+    // Set background color based on suit
+    const suitColors = {
+      'Red': '#e74c3c',
+      'Green': '#27ae60', 
+      'Black': '#2c3e50',
+      'Yellow': '#f39c12'
+    };
+    
+    if (suitColors[currentTrumpSuit]) {
+      pill.style.background = suitColors[currentTrumpSuit];
+    }
+  } else if (pill) {
+    pill.textContent = '';
+    pill.style.background = '#e74c3c'; // Reset to default red
+  }
+}
+
 function updateLeadIndicator() {
   // Clear all indicators
   document.getElementById('lead-player').textContent = '';
@@ -671,6 +710,9 @@ function startGame() {
   clearPlayedCards();
   clearDebugLog();
   updateKittyPill();
+  updateDealPill();
+  updateBidPill();
+  updatePowerSuitPill();
   updateAIStats();
   updatePlayerHandStats();
   updateLeadIndicator();
@@ -714,15 +756,17 @@ function startDealingAnimation() {
   const overlay = document.getElementById('dealing-overlay');
   if (overlay) overlay.style.display = 'flex';
   let kittyCount = 0;
-  let totalCards = 45; // 4x10 + 5 kitty (example, adjust as needed)
+  let totalCards = 57; // Rook deck has 57 cards
   let cardsDealt = 0;
   let kittyPill = document.getElementById('kitty-pill');
+  let dealPill = document.getElementById('deal-pill');
   let dealInterval = setInterval(() => {
     cardsDealt++;
-    // Simulate adding to kitty every 9th card (example logic)
-    if (cardsDealt % 9 === 0 && kittyCount < 5) {
+    // Simulate adding to kitty every 10th card (57 cards = 4x13 + 5 kitty)
+    if (cardsDealt % 10 === 0 && kittyCount < 5) {
       kittyCount++;
       if (kittyPill) kittyPill.textContent = `Kitty (${kittyCount})`;
+      if (dealPill) dealPill.textContent = `Kitty (${kittyCount})`;
     }
     // Animate dots
     const dots = document.getElementById('dealing-dots');
@@ -796,6 +840,51 @@ if (tourBox && tourToggleBtn) {
   };
 }
 
+// Settings toggle functionality
+const settingsToggleBtn = document.getElementById('settings-toggle-btn');
+const settingsContent = document.getElementById('settings-content');
+if (settingsToggleBtn && settingsContent) {
+  settingsToggleBtn.onclick = () => {
+    const isExpanded = settingsContent.style.display !== 'none';
+    if (isExpanded) {
+      settingsContent.style.display = 'none';
+      settingsToggleBtn.classList.remove('expanded');
+    } else {
+      settingsContent.style.display = 'block';
+      settingsToggleBtn.classList.add('expanded');
+    }
+  };
+}
+
+// Team name update functionality
+const teamNameInput = document.getElementById('team-name-input');
+const yourTeamNameDisplay = document.getElementById('your-team-name');
+if (teamNameInput && yourTeamNameDisplay) {
+  teamNameInput.addEventListener('input', () => {
+    const teamName = teamNameInput.value.trim();
+    yourTeamNameDisplay.textContent = teamName || 'Your Team Name';
+  });
+}
+
+// Player name update functionality
+const playerNameInput = document.getElementById('player-name-input');
+const yourNameDisplay = document.querySelector('.team-member');
+if (playerNameInput && yourNameDisplay) {
+  playerNameInput.addEventListener('input', () => {
+    const playerName = playerNameInput.value.trim();
+    yourNameDisplay.textContent = playerName || 'Your name';
+  });
+}
+
+// Start bidding button functionality
+const startBiddingBtn = document.getElementById('start-bidding-btn');
+if (startBiddingBtn) {
+  startBiddingBtn.onclick = () => {
+    startBiddingBtn.disabled = true;
+    startBidding();
+  };
+}
+
 // Track dealer index (0=You, 1=P3, 2=P2, 3=P1)
 let dealerIndex = 0;
 let playerNames = ['You', 'P3 (Blitz)', 'P2 (Shadow)', 'P1 (Rook)'];
@@ -827,8 +916,9 @@ function showBiddingModal() {
   biddingState = [null, null, null, null];
   renderBiddingTable();
   renderBiddingPlayerHand(); // <-- Ensure hand is visible in modal
-  // Start bidding loop
-  startBidding();
+  // Don't start bidding automatically - wait for button click
+  clearBiddingLog();
+  addBiddingLogEntry('Ready to start bidding. Click "Start the bidding" to begin.', 'info');
 }
 
 function renderBiddingTable() {
@@ -845,17 +935,26 @@ function renderBiddingTable() {
     const bidTd = document.createElement('td');
     bidTd.style.textAlign = 'center';
     bidTd.textContent = biddingState[i] === null ? '' : (biddingState[i] === 'pass' ? 'Pass' : biddingState[i]);
-    // Comment out Shoot the Moon column for now
-    /*
-    const moonTd = document.createElement('td');
-    moonTd.style.textAlign = 'center';
-    moonTd.textContent = (biddingState[i] === 200) ? '🌙' : '';
-    tr.appendChild(moonTd);
-    */
     tr.appendChild(nameTd);
     tr.appendChild(bidTd);
     tbody.appendChild(tr);
   }
+}
+
+function addBiddingLogEntry(message, type = 'info') {
+  const logDiv = document.getElementById('bidding-log');
+  if (!logDiv) return;
+  
+  const entry = document.createElement('div');
+  entry.className = `bidding-log-entry ${type}`;
+  entry.textContent = message;
+  logDiv.appendChild(entry);
+  logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+function clearBiddingLog() {
+  const logDiv = document.getElementById('bidding-log');
+  if (logDiv) logDiv.innerHTML = '';
 }
 
 // Simple AI bidding logic
@@ -880,7 +979,11 @@ function startBidding() {
   highestBidder = null;
   passes = 0;
   biddingState = [null, null, null, null];
+  updateBidPill(); // Clear the bid pill
   renderBiddingTable();
+  clearBiddingLog();
+  addBiddingLogEntry(`Bidding starts. ${playerNames[dealerIndex]} is the dealer.`, 'info');
+  addBiddingLogEntry(`${playerNames[currentBidder]} goes first.`, 'info');
   biddingTurn();
 }
 
@@ -890,19 +993,32 @@ function biddingTurn() {
   // Check if bidding should end
   // 1. Someone bid 200 (maximum bid)
   if (currentBid === 200 && highestBidder !== null) {
+    addBiddingLogEntry(`${playerNames[highestBidder]} bid 200 - bidding ends!`, 'action');
     handleBidWinner(highestBidder);
     return;
   }
   
   // 2. All but one have passed
   if (passes >= 3 && highestBidder !== null) {
+    addBiddingLogEntry(`All others have passed. ${playerNames[highestBidder]} wins the bid at ${currentBid}!`, 'action');
     handleBidWinner(highestBidder);
     return;
   }
   
+  // 3. Check if everyone except the current highest bidder has passed
+  if (highestBidder !== null) {
+    const passedPlayers = biddingState.filter((bid, index) => bid === 'pass' && index !== highestBidder).length;
+    const totalPlayers = 4;
+    if (passedPlayers >= totalPlayers - 1) {
+      addBiddingLogEntry(`All others have passed. ${playerNames[highestBidder]} wins the bid at ${currentBid}!`, 'action');
+      handleBidWinner(highestBidder);
+      return;
+    }
+  }
+  
   // If it's the human's turn
   if (currentBidder === 0) {
-    document.getElementById('bidding-status').textContent = 'Your turn to bid or pass.';
+    addBiddingLogEntry('Your turn to bid or pass.', 'info');
     document.getElementById('bidding-controls').style.display = '';
     // Set min/max for input
     const input = document.getElementById('player-bid-input');
@@ -913,45 +1029,36 @@ function biddingTurn() {
       // Update placeholder to show minimum valid bid
       input.placeholder = `Your bid (${input.min}-200)`;
     }
-    // Comment out Shoot the Moon checkbox for now
-    // const moon = document.getElementById('shoot-moon-checkbox');
-    // if (moon) moon.checked = false;
     // Set up event handlers
     document.getElementById('submit-bid-btn').onclick = () => {
       const val = parseInt(input.value, 10);
       if (isNaN(val) || val < input.min || val > 200 || (currentBid !== 0 && val < currentBid + 5)) {
-        document.getElementById('bidding-error-msg').textContent = `Bid must be at least ${input.min} and at most 200.`;
+        addBiddingLogEntry(`Invalid bid. Must be at least ${input.min} and at most 200.`, 'error');
         return;
       }
       biddingState[0] = val;
       currentBid = val;
       highestBidder = 0;
       passes = 0;
-      document.getElementById('bidding-error-msg').textContent = '';
+      updateBidPill();
+      addBiddingLogEntry(`You bid ${val}.`, 'action');
+      
+      // Check if everyone else has already passed
+      const otherPlayersPassed = biddingState.slice(1).every(bid => bid === 'pass');
+      if (otherPlayersPassed) {
+        addBiddingLogEntry(`All others have passed. You win the bid at ${val}!`, 'action');
+        handleBidWinner(0);
+        return;
+      }
+      
       nextBidder();
     };
     document.getElementById('pass-bid-btn').onclick = () => {
       biddingState[0] = 'pass';
       passes++;
-      document.getElementById('bidding-error-msg').textContent = '';
+      addBiddingLogEntry('You pass.', 'action');
       nextBidder();
     };
-    // Comment out Shoot the Moon functionality for now
-    /*
-    moon.onchange = () => {
-      if (moon.checked) {
-        biddingState[0] = 200;
-        currentBid = 200;
-        highestBidder = 0;
-        passes = 0;
-        document.getElementById('bidding-error-msg').textContent = '';
-        renderBiddingTable();
-        document.getElementById('bidding-status').textContent = `${playerNames[0]} shoots the moon!`;
-        // End bidding immediately
-        // TODO: proceed to kitty/trump phase
-      }
-    };
-    */
   } else {
     // AI turn
     document.getElementById('bidding-controls').style.display = 'none';
@@ -961,11 +1068,14 @@ function biddingTurn() {
       if (aiChoice === 'pass') {
         biddingState[currentBidder] = 'pass';
         passes++;
+        addBiddingLogEntry(`${playerNames[currentBidder]} passes.`, 'action');
       } else {
         biddingState[currentBidder] = aiChoice;
         currentBid = aiChoice;
         highestBidder = currentBidder;
         passes = 0;
+        updateBidPill();
+        addBiddingLogEntry(`${playerNames[currentBidder]} bids ${aiChoice}.`, 'action');
       }
       nextBidder();
     }, 900);
@@ -997,23 +1107,33 @@ function handleBidWinner(winnerIndex) {
     }
   }
   
-  // Wait 1.5 seconds before showing the kitty/trump modal
-  setTimeout(() => {
-    // Hide the bidding modal
-    if (handModal) handModal.style.display = 'none';
-    
-    // Show the kitty/trump modal
-    const kittyModal = document.getElementById('kitty-trump-modal');
-    if (kittyModal) kittyModal.style.display = 'flex';
-    
-    if (winnerIndex === 0) {
-      // Human player won - show kitty and hand selection
-      showHumanTrumpSelection();
-    } else {
-      // Computer player won - show computer selection
-      showComputerTrumpSelection(winnerIndex);
-    }
-  }, 1500);
+  // Show the "Next / proceed" button
+  const startBiddingBtn = document.getElementById('start-bidding-btn');
+  const proceedBtn = document.getElementById('proceed-btn');
+  if (startBiddingBtn) startBiddingBtn.style.display = 'none';
+  if (proceedBtn) {
+    proceedBtn.style.display = 'inline-block';
+    proceedBtn.onclick = () => {
+      // Hide the bidding modal
+      if (handModal) handModal.style.display = 'none';
+      
+      // Show the kitty/trump modal
+      const kittyModal = document.getElementById('kitty-trump-modal');
+      if (kittyModal) kittyModal.style.display = 'flex';
+      
+      if (winnerIndex === 0) {
+        // Human player won - show kitty and hand selection
+        showHumanTrumpSelection();
+      } else {
+        // Computer player won - show computer selection
+        showComputerTrumpSelection(winnerIndex);
+      }
+    };
+  }
+  
+  // Add final log entry
+  addBiddingLogEntry(`${playerNames[winnerIndex]} won the bid at ${currentBid} points!`, 'action');
+  addBiddingLogEntry('Click "Next / proceed" to continue.', 'info');
 }
 
 function showComputerTrumpSelection(winnerIndex) {
@@ -1021,21 +1141,52 @@ function showComputerTrumpSelection(winnerIndex) {
   document.getElementById('computer-trump-section').style.display = 'block';
   document.getElementById('human-trump-section').style.display = 'none';
   
-  // Update title
-  document.getElementById('kitty-modal-title').textContent = `${playerNames[winnerIndex]} Won the Bid`;
+  // Update title with bid amount
+  document.getElementById('kitty-modal-title').textContent = `${playerNames[winnerIndex]} Won the Bid at ${currentBid} Points`;
   
-  // Simulate computer thinking
+  // Simulate computer looking through kitty first
   setTimeout(() => {
-    // Computer chooses trump randomly
-    const trumpSuits = ['Red', 'Green', 'Black', 'Yellow'];
-    const chosenTrump = trumpSuits[Math.floor(Math.random() * trumpSuits.length)];
+    document.getElementById('computer-thinking').textContent = `${playerNames[winnerIndex]} is looking through the kitty...`;
+    document.getElementById('computer-thinking').style.display = 'block';
     
-    // Show result
-    document.getElementById('computer-thinking').style.display = 'none';
-    document.getElementById('computer-result').style.display = 'block';
-    document.getElementById('computer-trump-message').textContent = `${playerNames[winnerIndex]} chose ${chosenTrump} as the power suit.`;
-    document.getElementById('begin-play-btn').style.display = 'inline-block';
-  }, 2000);
+    // Then simulate choosing trump
+    setTimeout(() => {
+      document.getElementById('computer-thinking').textContent = `${playerNames[winnerIndex]} is choosing power suit...`;
+      
+      // Computer chooses trump randomly
+      const trumpSuits = ['Red', 'Green', 'Black', 'Yellow'];
+      const chosenTrump = trumpSuits[Math.floor(Math.random() * trumpSuits.length)];
+      
+      // Set the trump suit
+      currentTrumpSuit = chosenTrump;
+      
+      // Show result
+      setTimeout(() => {
+        document.getElementById('computer-thinking').style.display = 'none';
+        document.getElementById('computer-result').style.display = 'block';
+        document.getElementById('computer-trump-message').textContent = `${playerNames[winnerIndex]} chose ${chosenTrump} as the power suit.`;
+        updatePowerSuitPill();
+        
+        // Show the button and set it up
+        const beginPlayBtn = document.querySelector('#kitty-trump-modal #begin-play-btn');
+        if (beginPlayBtn) {
+          beginPlayBtn.style.display = 'inline-block';
+          beginPlayBtn.textContent = "Let's go";
+          beginPlayBtn.onclick = () => {
+            // Close the modal
+            const kittyModal = document.getElementById('kitty-trump-modal');
+            if (kittyModal) kittyModal.style.display = 'none';
+            
+            // Start the actual game
+            startActualGame();
+          };
+          addDebugLog('"Let\'s go" button should now be visible');
+        } else {
+          addDebugLog('ERROR: begin-play-btn element not found!');
+        }
+      }, 1000);
+    }, 1500);
+  }, 500);
 }
 
 function showHumanTrumpSelection() {
@@ -1043,8 +1194,8 @@ function showHumanTrumpSelection() {
   document.getElementById('computer-trump-section').style.display = 'none';
   document.getElementById('human-trump-section').style.display = 'block';
   
-  // Update title
-  document.getElementById('kitty-modal-title').textContent = 'You Won the Bid - Select Cards & Trump';
+  // Update title with bid amount
+  document.getElementById('kitty-modal-title').textContent = `You Won the Bid at ${currentBid} Points - Select Cards & Trump`;
   
   // Render kitty cards
   renderKittyCards();
@@ -1199,7 +1350,8 @@ function handleHumanSelection() {
   updateGameStats();
   
   // Store the trump suit for the game
-  // TODO: Add a global variable to store trump suit
+  currentTrumpSuit = chosenTrump;
+  updatePowerSuitPill();
   
   // Close the modal
   const kittyModal = document.getElementById('kitty-trump-modal');

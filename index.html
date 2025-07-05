@@ -107,15 +107,15 @@
     </div>
     <div class="tour-item" id="tour-deal">
       <span class="tour-checkbox">☐</span>
-      <span class="tour-text">Deal</span>
+      <span class="tour-text">Deal: <span id="kitty-pill"></span></span>
     </div>
     <div class="tour-item" id="tour-bidding">
       <span class="tour-checkbox">☐</span>
-      <span class="tour-text">Bidding <span id="kitty-pill"></span></span>
+      <span class="tour-text">Bid: <span id="bid-pill"></span></span>
     </div>
     <div class="tour-item" id="tour-power-suit">
       <span class="tour-checkbox">☐</span>
-      <span class="tour-text">Power suit</span>
+      <span class="tour-text">Power suit: <span id="power-suit-pill"></span></span>
     </div>
     <div class="tour-item" id="tour-your-turn">
       <span class="tour-checkbox">☐</span>
@@ -208,23 +208,44 @@
   <div id="new-game-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
       <h2>New Game Setup</h2>
-      <label>Your Name: <input type="text" id="player-name-input" placeholder="Your name"></label><br>
-      <label>Team Name: <input type="text" id="team-name-input" placeholder="Team name"></label><br>
-      <label>Opponents:<br>
-        <select id="opponent-select" multiple>
-          <option>P1 (Rook)</option>
-          <option>P2 (Shadow)</option>
-          <option>P3 (Blitz)</option>
-        </select>
-      </label><br>
-      <fieldset style="margin-top:1em;">
-        <legend>Point Values</legend>
-        <label>1: <input type="number" id="points-1" value="15"></label>
-        <label>14: <input type="number" id="points-14" value="10"></label>
-        <label>10: <input type="number" id="points-10" value="10"></label>
-        <label>5: <input type="number" id="points-5" value="5"></label>
-        <label>Rook: <input type="number" id="points-rook" value="20"></label>
-      </fieldset>
+      <label>Your Name: <input type="text" id="player-name-input" placeholder="Your name"></label>
+      <label>Team Name: <input type="text" id="team-name-input" placeholder="Team name"></label>
+      <hr style="margin: 1.5em 0; border: none; border-top: 1px solid #e9ecef;">
+      
+      <div class="team-layout">
+        <div class="team-column">
+          <h3 id="your-team-name">Your Team Name</h3>
+          <div class="team-member">Your name</div>
+          <div class="team-member">P2 (Shadow)</div>
+        </div>
+        
+        <div class="vs-column">
+          <div class="vs-text">vs.</div>
+        </div>
+        
+        <div class="team-column">
+          <h3>Team Computer</h3>
+          <div class="team-member">P1 (Rook)</div>
+          <div class="team-member">P3 (Blitz)</div>
+        </div>
+      </div>
+      
+      <div class="settings-toggle">
+        <button type="button" id="settings-toggle-btn" class="settings-toggle-btn">
+          <span class="toggle-icon">▼</span> Settings
+        </button>
+        <div id="settings-content" class="settings-content" style="display:none;">
+          <fieldset style="margin-top:1em;">
+            <legend>Point Values</legend>
+            <label>1: <input type="number" id="points-1" value="15"></label>
+            <label>14: <input type="number" id="points-14" value="10"></label>
+            <label>10: <input type="number" id="points-10" value="10"></label>
+            <label>5: <input type="number" id="points-5" value="5"></label>
+            <label>Rook: <input type="number" id="points-rook" value="20"></label>
+          </fieldset>
+        </div>
+      </div>
+      
       <button id="start-game-btn">Start Game</button>
     </div>
   </div>
@@ -232,29 +253,41 @@
   <!-- Start of Hand Modal -->
   <div id="hand-setup-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
-      <h2>Start of Hand</h2>
+      <div class="modal-header">
+        <h2>Start of Hand</h2>
+        <button id="start-bidding-btn" class="action-btn">Start the bidding</button>
+        <button id="proceed-btn" class="action-btn" style="display:none;">Next / proceed</button>
+      </div>
       <div id="bidding-section">
         <h3>Bidding</h3>
-        <div id="bidding-status">(Bidding instructions/status go here)</div>
-        <table id="bidding-table" style="width:100%;margin:1em 0 1.5em 0;border-collapse:collapse;">
-          <thead>
-            <tr>
-              <th style="text-align:left;">Player</th>
-              <th style="text-align:center;">Bid</th>
-              <th style="text-align:center;">Shoot the Moon</th>
-            </tr>
-          </thead>
-          <tbody id="bidding-table-body">
-            <!-- Bidding rows will be rendered here -->
-          </tbody>
-        </table>
-        <div id="bidding-controls" style="margin-bottom:1.2em;">
-          <input type="number" id="player-bid-input" placeholder="Your bid (100-200)" min="100" max="200" step="5" style="width:120px;">
-          <button id="submit-bid-btn">Bid</button>
-          <button id="pass-bid-btn">Pass</button>
-          <label style="margin-left:1em;"><input type="checkbox" id="shoot-moon-checkbox"> Shoot the Moon</label>
+        <div class="bidding-layout">
+          <div class="bidding-table-column">
+            <table id="bidding-table" style="width:100%;margin:1em 0 1.5em 0;border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th style="text-align:left;">Player</th>
+                  <th style="text-align:center;">Bid</th>
+                </tr>
+              </thead>
+              <tbody id="bidding-table-body">
+                <!-- Bidding rows will be rendered here -->
+              </tbody>
+            </table>
+            <div id="bidding-controls" style="margin-bottom:1.2em;">
+              <input type="number" id="player-bid-input" placeholder="Your bid (100-200)" min="100" max="200" step="5" style="width:120px;">
+              <button id="submit-bid-btn">Bid</button>
+              <button id="pass-bid-btn">Pass</button>
+            </div>
+          </div>
+          
+          <div class="bidding-log-column">
+            <h4>Bidding Log</h4>
+            <div id="bidding-log" class="bidding-log">
+              <!-- Bidding log entries will be added here -->
+            </div>
+          </div>
         </div>
-        <div id="bidding-error-msg" style="color:#dc2626;font-weight:600;"></div>
+        
         <div id="bidding-player-hand" style="margin-top:2em;">
           <h4>Your Hand</h4>
           <div id="bidding-player-cards"></div>
@@ -339,6 +372,7 @@
   </div>
   <script src="ui.js"></script>
   <script src="game-setup.js"></script>
+  <script src="ai-players.js"></script>
   <script src="main.js"></script>
 
 </body>
