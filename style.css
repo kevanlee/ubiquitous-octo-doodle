@@ -583,6 +583,7 @@ body {
   margin: 0;
   width: 100%;
   min-width: 260px;
+  position: relative;
 }
 
 #played-cards {
@@ -799,21 +800,29 @@ body {
   border: 1px solid #ccc;
 }
 
-@media (max-width: 900px) {
-  .game-columns {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    gap: 1rem;
-  }
-  .player-row, .ai-row-bottom {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-  .ai-row-main {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+#lead-indicator-box {
+  position: absolute;
+  top: 0.7em;
+  right: 1.2em;
+  background: rgba(255,255,255,0.95);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 0.3em 0.9em;
+  font-size: 1.05em;
+  color: #333;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.lead-emoji {
+  font-size: 1.3em;
+  margin-right: 0.2em;
+}
+#lead-color-name {
+  font-weight: bold;
+  margin-left: 0.7em;
+  color: #6c3483;
 }
   
 .player-hand-header {
@@ -836,6 +845,7 @@ body {
   display: flex;
   flex-direction: row;
   gap: 0.7rem;
+  align-items: center;
 }
 .player-hand-stat {
   display: flex;
@@ -861,5 +871,231 @@ body {
   min-width: 1.8em;
   text-align: center;
   box-shadow: 0 1px 3px rgba(140, 52, 131, 0.07);
+}
+#hand-error-msg {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 1.05em;
+  margin-left: 1em;
+  align-self: center;
+  min-width: 120px;
+}
+  
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 2.2em 2.5em 2em 2.5em;
+  min-width: 320px;
+  max-width: 95vw;
+  min-height: 180px;
+  text-align: left;
+  position: relative;
+}
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 1.4em;
+  color: #6c3483;
+}
+.modal-content label {
+  display: block;
+  margin: 0.7em 0 0.2em 0;
+  font-weight: 500;
+}
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content select {
+  font-size: 1em;
+  padding: 0.3em 0.7em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-left: 0.5em;
+  margin-bottom: 0.3em;
+}
+.modal-content button {
+  margin-top: 1.2em;
+  background: #6c3483;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.6em 1.5em;
+  font-size: 1.1em;
+  font-family: 'Fira Mono', monospace;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.modal-content button:hover {
+  background: #50246a;
+}
+fieldset {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 0.7em 1em 0.7em 1em;
+  margin-bottom: 0.7em;
+}
+legend {
+  font-size: 1em;
+  color: #6c3483;
+  font-weight: 600;
+}
+  
+.dealing-spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #e1c97a;
+  border-top: 5px solid #6c3483;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+  
+/* Bidding modal specific card styling */
+#bidding-player-cards .card {
+  width: 50px;
+  height: 80px;
+  font-size: 14px;
+  margin: 0 1px;
+}
+
+#bidding-player-cards .card::before {
+  font-size: 8px;
+  top: 2px;
+  left: 2px;
+}
+
+#bidding-player-cards .card::after {
+  font-size: 8px;
+  bottom: 2px;
+  right: 2px;
+}
+
+/* Keep regular game cards at normal size */
+#player-cards .card,
+#p1-cards .card,
+#p2-cards .card,
+#p3-cards .card {
+  width: 60px;
+  height: 90px;
+  font-size: 16px;
+  margin: 0 0.25rem;
+}
+
+#player-cards .card::before,
+#p1-cards .card::before,
+#p2-cards .card::before,
+#p3-cards .card::before {
+  font-size: 12px;
+  top: 4px;
+  left: 4px;
+}
+
+#player-cards .card::after,
+#p1-cards .card::after,
+#p2-cards .card::after,
+#p3-cards .card::after {
+  font-size: 12px;
+  bottom: 4px;
+  right: 4px;
+}
+
+/* Kitty & Trump Modal Styling */
+#kitty-trump-modal .modal-content {
+  max-width: 800px;
+  min-height: 400px;
+}
+
+#kitty-cards-section,
+#player-hand-section {
+  margin-bottom: 1.5em;
+}
+
+#kitty-cards-display,
+#modal-player-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5em 0;
+  min-height: 60px;
+}
+
+#kitty-cards-display .card,
+#modal-player-cards .card {
+  width: 50px;
+  height: 80px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#kitty-cards-display .card::before,
+#modal-player-cards .card::before {
+  font-size: 10px;
+  top: 3px;
+  left: 3px;
+}
+
+#kitty-cards-display .card::after,
+#modal-player-cards .card::after {
+  font-size: 10px;
+  bottom: 3px;
+  right: 3px;
+}
+
+/* Card selection styling */
+.card.selected {
+  border: 3px solid #6c3483;
+  box-shadow: 0 0 8px rgba(108, 52, 131, 0.6);
+  transform: translateY(-2px);
+}
+
+#selection-counter {
+  font-weight: 600;
+  color: #6c3483;
+  margin: 0.5em 0;
+}
+
+#trump-dropdown {
+  font-size: 1em;
+  padding: 0.5em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 0.5em;
+  min-width: 150px;
+}
+
+#confirm-selection-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#computer-thinking {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin: 1em 0;
+}
+
+#computer-result {
+  text-align: center;
+  margin: 1em 0;
+}
+
+#computer-trump-message {
+  font-weight: 600;
+  color: #6c3483;
+  font-size: 1.1em;
 }
   
