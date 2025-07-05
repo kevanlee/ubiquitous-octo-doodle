@@ -910,8 +910,14 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+/* New Game modal has solid background */
+#new-game-modal {
+  background: #f8f9fa;
+}
 .modal-content {
   background: #fff;
+  border: 1px solid #cdcdcd;
   border-radius: 2px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   padding: 1.5em;
@@ -1315,6 +1321,20 @@ legend {
 
 .team-column {
   text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Your team - subtle orange */
+.team-column:first-child {
+  background: rgba(255, 165, 0, 0.1);
+  border: 1px solid rgba(255, 165, 0, 0.2);
+}
+
+/* Computer team - subtle purple */
+.team-column:last-child {
+  background: rgba(108, 52, 131, 0.1);
+  border: 1px solid rgba(108, 52, 131, 0.2);
 }
 
 .team-column h3 {

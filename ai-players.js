@@ -6,6 +6,9 @@ const AI_PLAYERS = {
   p1: {
     "Rook": {
       name: "Rook",
+      firstName: "Reginald",
+      lastName: "Rooksworth",
+      fullName: "Reginald Rooksworth",
       personality: "Calculating and strategic",
       description: "A master tactician who carefully analyzes every move. Prefers high-value cards and conservative bidding.",
       image: "🦅", // Eagle emoji for Rook
@@ -61,6 +64,9 @@ const AI_PLAYERS = {
     
     "Shadow": {
       name: "Shadow",
+      firstName: "Silas",
+      lastName: "Shadowmire",
+      fullName: "Silas Shadowmire",
       personality: "Mysterious and unpredictable",
       description: "A player who thrives on misdirection and surprise tactics. Hard to read and even harder to predict.",
       image: "👤", // Shadow figure emoji
@@ -116,6 +122,9 @@ const AI_PLAYERS = {
     
     "Blitz": {
       name: "Blitz",
+      firstName: "Bolt",
+      lastName: "Blitzkrieg",
+      fullName: "Bolt Blitzkrieg",
       personality: "Aggressive and fast-paced",
       description: "A high-energy player who loves to bid high and play aggressively. Speed and pressure are their weapons.",
       image: "⚡", // Lightning bolt emoji
@@ -170,10 +179,190 @@ const AI_PLAYERS = {
     }
   },
   
+  // Player 2 personalities
+  p2: {
+    "Shadow": {
+      name: "Shadow",
+      firstName: "Silas",
+      lastName: "Shadowmire",
+      fullName: "Silas Shadowmire",
+      personality: "Mysterious and unpredictable",
+      description: "A player who thrives on misdirection and surprise tactics. Hard to read and even harder to predict.",
+      image: "👤", // Shadow figure emoji
+      quotes: {
+        bidding: [
+          "The shadows hold many secrets...",
+          "You think you know what I'm thinking?",
+          "Sometimes the best bid is no bid at all.",
+          "Let the darkness guide my hand."
+        ],
+        playing: [
+          "You never see the knife that cuts you.",
+          "I move like the wind - unpredictable.",
+          "Your confidence will be your downfall.",
+          "The shadows always have the last laugh."
+        ],
+        winning: [
+          "The darkness prevails.",
+          "You never stood a chance.",
+          "The shadows never lose.",
+          "Your light was no match for my darkness."
+        ],
+        losing: [
+          "Even shadows can be cast aside.",
+          "The light... it burns.",
+          "I'll return stronger from the darkness.",
+          "This defeat only makes me more dangerous."
+        ]
+      },
+      strategies: {
+        bidding: {
+          style: "unpredictable",
+          minBidThreshold: 0.4,
+          maxBidAmount: 200,
+          bluffFrequency: 0.8
+        },
+        playing: {
+          style: "deceptive",
+          riskTolerance: 0.7,
+          trumpUsage: "surprise",
+          cardCounting: false,
+          memory: "selective"
+        }
+      },
+      playingStyle: {
+        aggression: 0.8,
+        conservatism: 0.2,
+        adaptability: 0.9,
+        bluffing: 0.9,
+        teamwork: 0.3
+      }
+    },
+    
+    "Swift": {
+      name: "Swift",
+      firstName: "Samantha",
+      lastName: "Swiftwind",
+      fullName: "Samantha Swiftwind",
+      personality: "Quick and efficient",
+      description: "A player who values speed and efficiency. Makes decisions quickly and adapts to changing situations.",
+      image: "💨", // Wind emoji
+      quotes: {
+        bidding: [
+          "Time is of the essence.",
+          "Quick decisions, better results.",
+          "I don't need time to think.",
+          "Speed is my advantage."
+        ],
+        playing: [
+          "Fast and efficient.",
+          "No time to waste.",
+          "I'll finish this quickly.",
+          "Swift as the wind."
+        ],
+        winning: [
+          "Efficiency wins again.",
+          "Speed and precision.",
+          "Quick victory.",
+          "Time well spent."
+        ],
+        losing: [
+          "Even the swift can stumble.",
+          "Speed isn't everything.",
+          "I'll be faster next time.",
+          "Time to regroup."
+        ]
+      },
+      strategies: {
+        bidding: {
+          style: "quick",
+          minBidThreshold: 0.5,
+          maxBidAmount: 180,
+          bluffFrequency: 0.3
+        },
+        playing: {
+          style: "efficient",
+          riskTolerance: 0.6,
+          trumpUsage: "quick",
+          cardCounting: true,
+          memory: "good"
+        }
+      },
+      playingStyle: {
+        aggression: 0.6,
+        conservatism: 0.4,
+        adaptability: 0.8,
+        bluffing: 0.4,
+        teamwork: 0.7
+      }
+    },
+    
+    "Steady": {
+      name: "Steady",
+      firstName: "Stanley",
+      lastName: "Steadfast",
+      fullName: "Stanley Steadfast",
+      personality: "Reliable and consistent",
+      description: "A player who values consistency and reliability. Makes steady, predictable moves that build up over time.",
+      image: "🛡️", // Shield emoji
+      quotes: {
+        bidding: [
+          "Steady as she goes.",
+          "Consistency is key.",
+          "I'll hold my ground.",
+          "Reliable as always."
+        ],
+        playing: [
+          "Steady progress.",
+          "Consistent play.",
+          "I'll maintain my course.",
+          "Steady wins the race."
+        ],
+        winning: [
+          "Consistency pays off.",
+          "Steady as always.",
+          "Reliability wins.",
+          "Steady hand, steady victory."
+        ],
+        losing: [
+          "Even the steady can falter.",
+          "Consistency isn't enough.",
+          "I'll stay steady.",
+          "Steady improvement needed."
+        ]
+      },
+      strategies: {
+        bidding: {
+          style: "consistent",
+          minBidThreshold: 0.6,
+          maxBidAmount: 160,
+          bluffFrequency: 0.2
+        },
+        playing: {
+          style: "reliable",
+          riskTolerance: 0.4,
+          trumpUsage: "consistent",
+          cardCounting: true,
+          memory: "excellent"
+        }
+      },
+      playingStyle: {
+        aggression: 0.3,
+        conservatism: 0.8,
+        adaptability: 0.5,
+        bluffing: 0.2,
+        teamwork: 0.9
+      }
+    }
+  },
+  
   // Player 3 personalities
   p3: {
     "Mystic": {
       name: "Mystic",
+      firstName: "Mystica",
+      lastName: "Moonwhisper",
+      fullName: "Mystica Moonwhisper",
       personality: "Intuitive and spiritual",
       description: "A player who relies on intuition and 'reading the cards'. Believes in fate and the flow of the game.",
       image: "🔮", // Crystal ball emoji
@@ -229,6 +418,9 @@ const AI_PLAYERS = {
     
     "Titan": {
       name: "Titan",
+      firstName: "Thaddeus",
+      lastName: "Thunderfist",
+      fullName: "Thaddeus Thunderfist",
       personality: "Powerful and dominant",
       description: "A player who believes in overwhelming force and dominance. Prefers to win through sheer power and intimidation.",
       image: "🏛️", // Greek temple emoji
@@ -284,6 +476,9 @@ const AI_PLAYERS = {
     
     "Sage": {
       name: "Sage",
+      firstName: "Solomon",
+      lastName: "Stargazer",
+      fullName: "Solomon Stargazer",
       personality: "Wise and patient",
       description: "A player who values wisdom and patience. Believes in learning from every game and adapting strategies over time.",
       image: "🧙", // Wizard emoji
@@ -367,6 +562,28 @@ function getPlayerStrategy(slot, playerKey) {
 function getPlayingStyle(slot, playerKey) {
   const player = getPlayerData(slot, playerKey);
   return player ? player.playingStyle : null;
+}
+
+// Function to select random AI players for a new game
+function selectRandomAIPlayers() {
+  const p1Player = getRandomPlayer('p1');
+  const p2Player = getRandomPlayer('p2');
+  const p3Player = getRandomPlayer('p3');
+  
+  return {
+    p1: {
+      key: p1Player,
+      data: getPlayerData('p1', p1Player)
+    },
+    p2: {
+      key: p2Player,
+      data: getPlayerData('p2', p2Player)
+    },
+    p3: {
+      key: p3Player,
+      data: getPlayerData('p3', p3Player)
+    }
+  };
 }
 
 // Export for use in other files

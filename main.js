@@ -32,6 +32,9 @@ let currentLeadColor = '';
 let currentTrickLeader = 0; // Track who led the current trick
 let currentTrumpSuit = ''; // Track the current trump suit
 
+// AI Players tracking
+let currentAIPlayers = null; // Will store the randomly selected AI players
+
 // DOM mapping for played cards
 const playedCardIds = ['player-played', 'p3-played', 'p2-played', 'p1-played'];
 
@@ -632,7 +635,7 @@ function updateDealPill() {
 function updateBidPill() {
   const pill = document.getElementById('bid-pill');
   if (pill && highestBidder !== null) {
-    pill.textContent = `${playerNames[highestBidder]} at ${currentBid} points`;
+    pill.textContent = `${getCurrentPlayerName(highestBidder)} at ${currentBid} points`;
   } else if (pill) {
     pill.textContent = '';
   }
@@ -657,6 +660,90 @@ function updatePowerSuitPill() {
   } else if (pill) {
     pill.textContent = '';
     pill.style.background = '#e74c3c'; // Reset to default red
+  }
+}
+
+function updateAIPlayerNames() {
+  if (!currentAIPlayers) return;
+  
+  // Update P1 name and image
+  const p1NameElem = document.querySelector('.ai-player.p1 h3');
+  if (p1NameElem) {
+    p1NameElem.textContent = currentAIPlayers.p1.data.fullName;
+    p1NameElem.innerHTML = `${currentAIPlayers.p1.data.image} ${currentAIPlayers.p1.data.fullName}`;
+  }
+  
+  // Update P3 name and image
+  const p3NameElem = document.querySelector('.ai-player.p3 h3');
+  if (p3NameElem) {
+    p3NameElem.textContent = currentAIPlayers.p3.data.fullName;
+    p3NameElem.innerHTML = `${currentAIPlayers.p3.data.image} ${currentAIPlayers.p3.data.fullName}`;
+  }
+  
+  // Update team names in the stats section
+  const opponentTeamElem = document.querySelector('.team-header:has(#opponent-team-points)');
+  if (opponentTeamElem) {
+    const teamLabel = opponentTeamElem.querySelector('.stat-label');
+    if (teamLabel) {
+      teamLabel.textContent = `Opponent Team (${currentAIPlayers.p1.data.fullName} + ${currentAIPlayers.p3.data.fullName}):`;
+    }
+  }
+  
+  // Update individual player stats labels
+  const p1PointsLabel = document.querySelector('#p1-points').previousElementSibling;
+  if (p1PointsLabel) {
+    p1PointsLabel.textContent = `${currentAIPlayers.p1.data.fullName} Points:`;
+  }
+  
+  const p3PointsLabel = document.querySelector('#p3-points').previousElementSibling;
+  if (p3PointsLabel) {
+    p3PointsLabel.textContent = `${currentAIPlayers.p3.data.fullName} Points:`;
+  }
+  
+  // Update New Game modal team members
+  const newGameP1Elem = document.querySelector('#new-game-modal .team-column:last-child .team-member:first-child');
+  if (newGameP1Elem) {
+    newGameP1Elem.innerHTML = `${currentAIPlayers.p1.data.image} ${currentAIPlayers.p1.data.fullName}`;
+    console.log('Updated P1 in New Game modal:', currentAIPlayers.p1.data.fullName);
+  } else {
+    console.log('P1 element not found in New Game modal');
+  }
+  
+  const newGameP2Elem = document.querySelector('#new-game-modal .team-column:first-child .team-member:last-child');
+  if (newGameP2Elem) {
+    newGameP2Elem.innerHTML = `${currentAIPlayers.p2.data.image} ${currentAIPlayers.p2.data.fullName}`;
+    console.log('Updated P2 in New Game modal:', currentAIPlayers.p2.data.fullName);
+  } else {
+    console.log('P2 element not found in New Game modal');
+  }
+  
+  const newGameP3Elem = document.querySelector('#new-game-modal .team-column:last-child .team-member:last-child');
+  if (newGameP3Elem) {
+    newGameP3Elem.innerHTML = `${currentAIPlayers.p3.data.image} ${currentAIPlayers.p3.data.fullName}`;
+    console.log('Updated P3 in New Game modal:', currentAIPlayers.p3.data.fullName);
+  } else {
+    console.log('P3 element not found in New Game modal');
+  }
+}
+
+function getCurrentPlayerName(index) {
+  if (!currentAIPlayers) {
+    // Fallback to generic names if no AI players selected
+    return playerNames[index];
+  }
+  
+  // Map player indices to AI players
+  switch (index) {
+    case 0: // Player (You)
+      return playerNames[0]; // Keep the human player name
+    case 1: // P3
+      return currentAIPlayers.p3.data.fullName;
+    case 2: // P2
+      return currentAIPlayers.p2.data.fullName;
+    case 3: // P1
+      return currentAIPlayers.p1.data.fullName;
+    default:
+      return playerNames[index];
   }
 }
 
@@ -690,6 +777,9 @@ function updateLeadColorIndicator() {
 }
 
 function startGame() {
+  // Select random AI players for this game
+  currentAIPlayers = selectRandomAIPlayers();
+  
   currentRound = 0;
   currentTurn = 0;
   currentTrickLeader = 0;
@@ -713,6 +803,7 @@ function startGame() {
   updateDealPill();
   updateBidPill();
   updatePowerSuitPill();
+  updateAIPlayerNames(); // Update UI with AI player names
   updateAIStats();
   updatePlayerHandStats();
   updateLeadIndicator();
@@ -727,9 +818,16 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function showNewGameModal() {
+  // Select random AI players for this game
+  currentAIPlayers = selectRandomAIPlayers();
+  
   const modal = document.getElementById('new-game-modal');
   if (modal) {
     modal.style.display = 'flex';
+    // Update AI player names in the modal after a short delay to ensure DOM is ready
+    setTimeout(() => {
+      updateAIPlayerNames();
+    }, 50);
     setTimeout(() => {
       const nameInput = document.getElementById('player-name-input');
       if (nameInput) nameInput.focus();
@@ -928,7 +1026,7 @@ function renderBiddingTable() {
   for (let i = 0; i < 4; i++) {
     const tr = document.createElement('tr');
     const nameTd = document.createElement('td');
-    nameTd.textContent = playerNames[i];
+    nameTd.textContent = getCurrentPlayerName(i);
     if (i === dealerIndex) {
       nameTd.innerHTML += ' <span style="color:#6c3483;font-weight:700;">(Dealer)</span>';
     }
@@ -982,8 +1080,8 @@ function startBidding() {
   updateBidPill(); // Clear the bid pill
   renderBiddingTable();
   clearBiddingLog();
-  addBiddingLogEntry(`Bidding starts. ${playerNames[dealerIndex]} is the dealer.`, 'info');
-  addBiddingLogEntry(`${playerNames[currentBidder]} goes first.`, 'info');
+  addBiddingLogEntry(`Bidding starts. ${getCurrentPlayerName(dealerIndex)} is the dealer.`, 'info');
+  addBiddingLogEntry(`${getCurrentPlayerName(currentBidder)} goes first.`, 'info');
   biddingTurn();
 }
 
@@ -993,14 +1091,14 @@ function biddingTurn() {
   // Check if bidding should end
   // 1. Someone bid 200 (maximum bid)
   if (currentBid === 200 && highestBidder !== null) {
-    addBiddingLogEntry(`${playerNames[highestBidder]} bid 200 - bidding ends!`, 'action');
+    addBiddingLogEntry(`${getCurrentPlayerName(highestBidder)} bid 200 - bidding ends!`, 'action');
     handleBidWinner(highestBidder);
     return;
   }
   
   // 2. All but one have passed
   if (passes >= 3 && highestBidder !== null) {
-    addBiddingLogEntry(`All others have passed. ${playerNames[highestBidder]} wins the bid at ${currentBid}!`, 'action');
+    addBiddingLogEntry(`All others have passed. ${getCurrentPlayerName(highestBidder)} wins the bid at ${currentBid}!`, 'action');
     handleBidWinner(highestBidder);
     return;
   }
@@ -1010,7 +1108,7 @@ function biddingTurn() {
     const passedPlayers = biddingState.filter((bid, index) => bid === 'pass' && index !== highestBidder).length;
     const totalPlayers = 4;
     if (passedPlayers >= totalPlayers - 1) {
-      addBiddingLogEntry(`All others have passed. ${playerNames[highestBidder]} wins the bid at ${currentBid}!`, 'action');
+      addBiddingLogEntry(`All others have passed. ${getCurrentPlayerName(highestBidder)} wins the bid at ${currentBid}!`, 'action');
       handleBidWinner(highestBidder);
       return;
     }
@@ -1068,14 +1166,14 @@ function biddingTurn() {
       if (aiChoice === 'pass') {
         biddingState[currentBidder] = 'pass';
         passes++;
-        addBiddingLogEntry(`${playerNames[currentBidder]} passes.`, 'action');
+        addBiddingLogEntry(`${getCurrentPlayerName(currentBidder)} passes.`, 'action');
       } else {
         biddingState[currentBidder] = aiChoice;
         currentBid = aiChoice;
         highestBidder = currentBidder;
         passes = 0;
         updateBidPill();
-        addBiddingLogEntry(`${playerNames[currentBidder]} bids ${aiChoice}.`, 'action');
+        addBiddingLogEntry(`${getCurrentPlayerName(currentBidder)} bids ${aiChoice}.`, 'action');
       }
       nextBidder();
     }, 900);
@@ -1103,7 +1201,7 @@ function handleBidWinner(winnerIndex) {
   if (handModal) {
     const statusElem = document.getElementById('bidding-status');
     if (statusElem) {
-      statusElem.textContent = `${playerNames[winnerIndex]} won the bid at ${currentBid} points!`;
+      statusElem.textContent = `${getCurrentPlayerName(winnerIndex)} won the bid at ${currentBid} points!`;
     }
   }
   
@@ -1132,7 +1230,7 @@ function handleBidWinner(winnerIndex) {
   }
   
   // Add final log entry
-  addBiddingLogEntry(`${playerNames[winnerIndex]} won the bid at ${currentBid} points!`, 'action');
+  addBiddingLogEntry(`${getCurrentPlayerName(winnerIndex)} won the bid at ${currentBid} points!`, 'action');
   addBiddingLogEntry('Click "Next / proceed" to continue.', 'info');
 }
 
@@ -1142,16 +1240,16 @@ function showComputerTrumpSelection(winnerIndex) {
   document.getElementById('human-trump-section').style.display = 'none';
   
   // Update title with bid amount
-  document.getElementById('kitty-modal-title').textContent = `${playerNames[winnerIndex]} Won the Bid at ${currentBid} Points`;
+  document.getElementById('kitty-modal-title').textContent = `${getCurrentPlayerName(winnerIndex)} Won the Bid at ${currentBid} Points`;
   
   // Simulate computer looking through kitty first
   setTimeout(() => {
-    document.getElementById('computer-thinking').textContent = `${playerNames[winnerIndex]} is looking through the kitty...`;
+    document.getElementById('computer-thinking').textContent = `${getCurrentPlayerName(winnerIndex)} is looking through the kitty...`;
     document.getElementById('computer-thinking').style.display = 'block';
     
     // Then simulate choosing trump
     setTimeout(() => {
-      document.getElementById('computer-thinking').textContent = `${playerNames[winnerIndex]} is choosing power suit...`;
+      document.getElementById('computer-thinking').textContent = `${getCurrentPlayerName(winnerIndex)} is choosing power suit...`;
       
       // Computer chooses trump randomly
       const trumpSuits = ['Red', 'Green', 'Black', 'Yellow'];
@@ -1164,7 +1262,7 @@ function showComputerTrumpSelection(winnerIndex) {
       setTimeout(() => {
         document.getElementById('computer-thinking').style.display = 'none';
         document.getElementById('computer-result').style.display = 'block';
-        document.getElementById('computer-trump-message').textContent = `${playerNames[winnerIndex]} chose ${chosenTrump} as the power suit.`;
+        document.getElementById('computer-trump-message').textContent = `${getCurrentPlayerName(winnerIndex)} chose ${chosenTrump} as the power suit.`;
         updatePowerSuitPill();
         
         // Show the button and set it up
