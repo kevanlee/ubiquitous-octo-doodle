@@ -828,11 +828,75 @@ function showNewGameModal() {
     setTimeout(() => {
       updateAIPlayerNames();
     }, 50);
+    
+    // Setup inline inputs with a longer delay to ensure everything is rendered
     setTimeout(() => {
-      const nameInput = document.getElementById('player-name-input');
-      if (nameInput) nameInput.focus();
-    }, 100);
+      setupInlineInputs();
+    }, 150);
+    // Removed auto-focus on name input
   }
+}
+
+function setupInlineInputs() {
+  const nameInput = document.getElementById('player-name-input');
+  const teamInput = document.getElementById('team-name-input');
+  
+  // Function to adjust input width
+  function adjustInputWidth(input) {
+    const placeholder = input.placeholder;
+    const value = input.value || placeholder;
+    
+    console.log('Adjusting width for:', value); // Debug log
+    
+    // Create a temporary span to measure text width
+    const tempSpan = document.createElement('span');
+    tempSpan.style.visibility = 'hidden';
+    tempSpan.style.position = 'absolute';
+    tempSpan.style.whiteSpace = 'pre';
+    tempSpan.style.font = window.getComputedStyle(input).font;
+    tempSpan.style.letterSpacing = window.getComputedStyle(input).letterSpacing;
+    tempSpan.style.wordSpacing = window.getComputedStyle(input).wordSpacing;
+    tempSpan.style.padding = window.getComputedStyle(input).padding;
+    tempSpan.style.margin = window.getComputedStyle(input).margin;
+    tempSpan.textContent = value;
+    
+    document.body.appendChild(tempSpan);
+    const textWidth = tempSpan.offsetWidth;
+    document.body.removeChild(tempSpan);
+    
+    console.log('Measured width:', textWidth); // Debug log
+    
+    // Add a small buffer for better visual alignment
+    const finalWidth = textWidth + 4;
+    input.style.setProperty('width', `${finalWidth}px`, 'important');
+    input.style.setProperty('min-width', 'unset', 'important');
+    console.log('Set width to:', finalWidth); // Debug log
+  }
+  
+  // Set up event listeners for both inputs
+  [nameInput, teamInput].forEach(input => {
+    if (input) {
+      // Adjust width on load
+      adjustInputWidth(input);
+      
+      // Adjust width on input
+      input.addEventListener('input', () => adjustInputWidth(input));
+      
+      // Adjust width on focus (show placeholder if empty)
+      input.addEventListener('focus', () => {
+        if (!input.value) {
+          adjustInputWidth(input);
+        }
+      });
+      
+      // Adjust width on blur (hide placeholder if empty)
+      input.addEventListener('blur', () => {
+        if (!input.value) {
+          input.style.width = '1ch';
+        }
+      });
+    }
+  });
 }
 
 // Handle Start Game button

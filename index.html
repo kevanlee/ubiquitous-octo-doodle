@@ -191,6 +191,11 @@
       <button id="new-game-btn" onclick="startGame()">New Game</button>
     </div>
   </div>
+  <!-- Rules Link -->
+  <div id="rules-link">
+    <a href="README.md" target="_blank" title="View Game Rules">📖 Rules</a>
+  </div>
+
   <div id="debug-section">
     <h2>Live Commentary</h2>
     <div id="debug-log" class="debug-log"></div>
@@ -207,9 +212,12 @@
   <!-- New Game Modal -->
   <div id="new-game-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
-      <h2>New Game Setup</h2>
-      <label>Your Name: <input type="text" id="player-name-input" placeholder="Your name"></label>
-      <label>Team Name: <input type="text" id="team-name-input" placeholder="Team name"></label>
+      <h3 class="welcome-message">
+        Hey there <input type="text" id="player-name-input" class="inline-input" placeholder="Cool Cat">!</br>
+        Let's play some Rook! You are on <input type="text" id="team-name-input" class="inline-input" placeholder="Team name">. 
+        When you're ready, hit the Start Game button below.
+      </h3>
+      
       <hr style="margin: 1.5em 0; border: none; border-top: 1px solid #e9ecef;">
       
       <div class="team-layout">

@@ -915,6 +915,12 @@ body {
 #new-game-modal {
   background: #f8f9fa;
 }
+
+/* New Game modal content width constraint */
+#new-game-modal .modal-content {
+  max-width: 60%;
+  min-width: 400px;
+}
 .modal-content {
   background: #fff;
   border: 1px solid #cdcdcd;
@@ -1379,6 +1385,91 @@ legend {
 }
 
 #start-game-btn:hover {
+  background: #555;
+}
+
+/* Welcome message styling */
+.welcome-message {
+  font-size: 1.1em;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 1.5em;
+}
+
+.inline-input {
+  display: inline-block;
+  border: none;
+  border-bottom: 2px dotted #6c3483;
+  background: transparent;
+  font-size: inherit;
+  font-family: inherit;
+  color: #6c3483;
+  font-weight: 600;
+  padding: 0.1em 0.3em;
+  margin: 0 0.2em;
+  min-width: 120px;
+  transition: all 0.2s ease;
+}
+
+.inline-input:focus {
+  outline: none;
+  border-bottom: 2px solid #6c3483;
+  background: rgba(108, 52, 131, 0.05);
+}
+
+.inline-input::placeholder {
+  color: #999;
+  font-weight: normal;
+}
+
+/* Welcome message input styling - more specific to override existing styles */
+#new-game-modal .welcome-message input[type="text"] {
+  padding: 0 !important;
+  margin: 0 !important;
+  min-width: unset !important; /* Remove min-width constraint */
+  width: 1ch !important; /* Start with 1 character width */
+  border: none !important;
+  border-bottom: 2px dashed #000 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  color: inherit !important;
+  transition: width 0.2s ease !important;
+}
+
+#new-game-modal .welcome-message input[type="text"]:focus {
+  outline: none !important;
+  border-bottom: 1px solid #000 !important;
+}
+
+#new-game-modal .welcome-message input[type="text"]::placeholder {
+  font-weight: 600 !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+}
+  
+/* Rules Link */
+#rules-link {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+}
+
+#rules-link a {
+  display: inline-block;
+  padding: 8px 12px;
+  background: #333;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+#rules-link a:hover {
   background: #555;
 }
   
