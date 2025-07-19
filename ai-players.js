@@ -8,10 +8,10 @@ const AI_PLAYERS = {
       name: "Rook",
       firstName: "Reginald",
       lastName: "Rooksworth",
-      fullName: "Reginald Rooksworth",
+      fullName: "Moonbeam",
       personality: "Calculating and strategic",
       description: "A master tactician who carefully analyzes every move. Prefers high-value cards and conservative bidding.",
-      image: "🦅", // Eagle emoji for Rook
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "Let me assess the situation...",
@@ -66,10 +66,10 @@ const AI_PLAYERS = {
       name: "Shadow",
       firstName: "Silas",
       lastName: "Shadowmire",
-      fullName: "Silas Shadowmire",
+      fullName: "Apple",
       personality: "Mysterious and unpredictable",
       description: "A player who thrives on misdirection and surprise tactics. Hard to read and even harder to predict.",
-      image: "👤", // Shadow figure emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "The shadows hold many secrets...",
@@ -124,10 +124,10 @@ const AI_PLAYERS = {
       name: "Blitz",
       firstName: "Bolt",
       lastName: "Blitzkrieg",
-      fullName: "Bolt Blitzkrieg",
+      fullName: "Biff",
       personality: "Aggressive and fast-paced",
       description: "A high-energy player who loves to bid high and play aggressively. Speed and pressure are their weapons.",
-      image: "⚡", // Lightning bolt emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "Let's make this interesting!",
@@ -185,10 +185,10 @@ const AI_PLAYERS = {
       name: "Shadow",
       firstName: "Silas",
       lastName: "Shadowmire",
-      fullName: "Silas Shadowmire",
+      fullName: "Shawarma",
       personality: "Mysterious and unpredictable",
       description: "A player who thrives on misdirection and surprise tactics. Hard to read and even harder to predict.",
-      image: "👤", // Shadow figure emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "The shadows hold many secrets...",
@@ -243,10 +243,10 @@ const AI_PLAYERS = {
       name: "Swift",
       firstName: "Samantha",
       lastName: "Swiftwind",
-      fullName: "Samantha Swiftwind",
+      fullName: "Special K",
       personality: "Quick and efficient",
       description: "A player who values speed and efficiency. Makes decisions quickly and adapts to changing situations.",
-      image: "💨", // Wind emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "Time is of the essence.",
@@ -301,10 +301,10 @@ const AI_PLAYERS = {
       name: "Steady",
       firstName: "Stanley",
       lastName: "Steadfast",
-      fullName: "Stanley Steadfast",
+      fullName: "Walter",
       personality: "Reliable and consistent",
       description: "A player who values consistency and reliability. Makes steady, predictable moves that build up over time.",
-      image: "🛡️", // Shield emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "Steady as she goes.",
@@ -362,10 +362,10 @@ const AI_PLAYERS = {
       name: "Mystic",
       firstName: "Mystica",
       lastName: "Moonwhisper",
-      fullName: "Mystica Moonwhisper",
+      fullName: "Pickle",
       personality: "Intuitive and spiritual",
       description: "A player who relies on intuition and 'reading the cards'. Believes in fate and the flow of the game.",
-      image: "🔮", // Crystal ball emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "The cards speak to me...",
@@ -420,10 +420,10 @@ const AI_PLAYERS = {
       name: "Titan",
       firstName: "Thaddeus",
       lastName: "Thunderfist",
-      fullName: "Thaddeus Thunderfist",
+      fullName: "Beyonce",
       personality: "Powerful and dominant",
       description: "A player who believes in overwhelming force and dominance. Prefers to win through sheer power and intimidation.",
-      image: "🏛️", // Greek temple emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "I am the master of this game!",
@@ -478,10 +478,10 @@ const AI_PLAYERS = {
       name: "Sage",
       firstName: "Solomon",
       lastName: "Stargazer",
-      fullName: "Solomon Stargazer",
+      fullName: "B.O.R.T.",
       personality: "Wise and patient",
       description: "A player who values wisdom and patience. Believes in learning from every game and adapting strategies over time.",
-      image: "🧙", // Wizard emoji
+      image: "images/avatar-basic.png",
       quotes: {
         bidding: [
           "Wisdom guides my decisions.",

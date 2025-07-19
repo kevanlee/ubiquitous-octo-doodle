@@ -913,13 +913,19 @@ body {
 
 /* New Game modal has solid background */
 #new-game-modal {
-  background: #f8f9fa;
+  background-image: url(images/background.gif);
 }
 
 /* New Game modal content width constraint */
 #new-game-modal .modal-content {
   max-width: 60%;
   min-width: 400px;
+}
+
+/* Hand Setup modal width constraint */
+#hand-setup-modal .modal-content {
+  max-width: 85%;
+  min-width: 600px;
 }
 .modal-content {
   background: #fff;
@@ -994,11 +1000,19 @@ legend {
 }
   
 /* Bidding modal specific card styling */
+#bidding-player-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: 100%;
+}
+
 #bidding-player-cards .card {
-  width: 50px;
-  height: 80px;
+  flex: 1;
+  min-width: 40px;
+  aspect-ratio: 5/8;
   font-size: 14px;
-  margin: 0 1px;
+  margin: 0;
 }
 
 #bidding-player-cards .card::before {
@@ -1124,6 +1138,30 @@ legend {
   margin: 1em 0;
 }
 
+/* Bidding Table Styling */
+#bidding-table {
+  width: 100%;
+  margin: 1em 0 1.5em 0;
+  border-collapse: collapse;
+}
+
+#bidding-table th,
+#bidding-table td {
+  padding: 0.5em;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+#bidding-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+#bidding-table tr:hover {
+  background: #f8f9fa;
+}
+
 .bidding-table-column {
   border-right: 1px solid #e9ecef;
   padding-right: 1rem;
@@ -1211,6 +1249,10 @@ legend {
 .action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+#start-bidding-btn {
+  margin: 1.2em 0 0 0;
 }
 
 /* Bid and Pass Button Styling */
@@ -1349,14 +1391,26 @@ legend {
   font-weight: 600;
 }
 
+.team-members {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
 .team-member {
   padding: 0.5em;
-  margin: 0.3em 0;
   background: white;
   border-radius: 4px;
   border: 1px solid #e9ecef;
-  font-size: 0.95em;
+  font-size: 0.9em;
   color: #333;
+  flex: 1;
+  max-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
 }
 
 .vs-column {
@@ -1399,7 +1453,7 @@ legend {
 .inline-input {
   display: inline-block;
   border: none;
-  border-bottom: 2px dotted #6c3483;
+  border-bottom: 2px dashed #6c3483;
   background: transparent;
   font-size: inherit;
   font-family: inherit;
@@ -1473,3 +1527,4 @@ legend {
   background: #555;
 }
   
+.avatar { width: 50px; height: 50px; display: block; margin: 0 auto;}

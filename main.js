@@ -703,24 +703,39 @@ function updateAIPlayerNames() {
   // Update New Game modal team members
   const newGameP1Elem = document.querySelector('#new-game-modal .team-column:last-child .team-member:first-child');
   if (newGameP1Elem) {
-    newGameP1Elem.innerHTML = `${currentAIPlayers.p1.data.image} ${currentAIPlayers.p1.data.fullName}`;
-    console.log('Updated P1 in New Game modal:', currentAIPlayers.p1.data.fullName);
+    const p1 = currentAIPlayers.p1.data;
+    if (p1.image && p1.image.startsWith('images/')) {
+      newGameP1Elem.innerHTML = `<img class="avatar" src="${p1.image}" alt="P1 Avatar"><span>${p1.fullName}</span>`;
+    } else {
+      newGameP1Elem.innerHTML = `<span style="font-size:2em;">${p1.image}</span><span>${p1.fullName}</span>`;
+    }
+    console.log('Updated P1 in New Game modal:', p1.fullName);
   } else {
     console.log('P1 element not found in New Game modal');
   }
   
   const newGameP2Elem = document.querySelector('#new-game-modal .team-column:first-child .team-member:last-child');
   if (newGameP2Elem) {
-    newGameP2Elem.innerHTML = `${currentAIPlayers.p2.data.image} ${currentAIPlayers.p2.data.fullName}`;
-    console.log('Updated P2 in New Game modal:', currentAIPlayers.p2.data.fullName);
+    const p2 = currentAIPlayers.p2.data;
+    if (p2.image && p2.image.startsWith('images/')) {
+      newGameP2Elem.innerHTML = `<img class="avatar" src="${p2.image}" alt="P2 Avatar"><span>${p2.fullName}</span>`;
+    } else {
+      newGameP2Elem.innerHTML = `<span style="font-size:2em;">${p2.image}</span><span>${p2.fullName}</span>`;
+    }
+    console.log('Updated P2 in New Game modal:', p2.fullName);
   } else {
     console.log('P2 element not found in New Game modal');
   }
   
   const newGameP3Elem = document.querySelector('#new-game-modal .team-column:last-child .team-member:last-child');
   if (newGameP3Elem) {
-    newGameP3Elem.innerHTML = `${currentAIPlayers.p3.data.image} ${currentAIPlayers.p3.data.fullName}`;
-    console.log('Updated P3 in New Game modal:', currentAIPlayers.p3.data.fullName);
+    const p3 = currentAIPlayers.p3.data;
+    if (p3.image && p3.image.startsWith('images/')) {
+      newGameP3Elem.innerHTML = `<img class="avatar" src="${p3.image}" alt="P3 Avatar"><span>${p3.fullName}</span>`;
+    } else {
+      newGameP3Elem.innerHTML = `<span style="font-size:2em;">${p3.image}</span><span>${p3.fullName}</span>`;
+    }
+    console.log('Updated P3 in New Game modal:', p3.fullName);
   } else {
     console.log('P3 element not found in New Game modal');
   }
